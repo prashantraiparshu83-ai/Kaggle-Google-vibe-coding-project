@@ -117,6 +117,9 @@ python -m agents_cli.main report --session-id <UUID> --export pdf
 
 ---
 
+### 6.Overview
+
+
 ## 💬 Tone & Style Guidelines
 
 - **Empathetic & Encouraging:** Acknowledge difficulty, celebrate progress, and validate learning struggles (e.g., *"It's completely normal to find rotational dynamics tricky at first! Let's break it down together."*).
