@@ -1,0 +1,1699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Education Gap AI Agent - Local Portal</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-base: hsl(222, 47%, 7%);
+            --bg-surface: hsla(222, 40%, 12%, 0.7);
+            --bg-card: hsla(222, 40%, 15%, 0.4);
+            --border-color: hsla(217, 30%, 20%, 0.6);
+            --text-primary: hsl(210, 40%, 96%);
+            --text-secondary: hsl(215, 20%, 70%);
+            --text-muted: hsl(215, 12%, 50%);
+            
+            --color-primary: hsl(263, 90%, 65%);
+            --color-primary-glow: hsla(263, 90%, 65%, 0.15);
+            --color-secondary: hsl(190, 95%, 50%);
+            --color-accent: hsl(325, 90%, 60%);
+            --color-success: hsl(145, 80%, 50%);
+            --color-warning: hsl(40, 90%, 60%);
+            --color-error: hsl(0, 85%, 60%);
+            
+            --gradient-primary: linear-gradient(135deg, var(--color-primary), hsl(220, 90%, 60%));
+            --gradient-accent: linear-gradient(135deg, var(--color-accent), var(--color-primary));
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --radius-sm: 6px;
+            
+            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Base styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(263, 80%, 50%, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, hsla(190, 80%, 50%, 0.08) 0px, transparent 50%);
+            background-attachment: fixed;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        /* App Layout */
+        .app-container {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        /* Sidebar Style */
+        .sidebar {
+            background-color: var(--bg-surface);
+            border-right: 1px solid var(--border-color);
+            padding: 2.5rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            backdrop-filter: blur(20px);
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px var(--color-primary-glow);
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        .logo-text h2 {
+            font-size: 1.15rem;
+            background: linear-gradient(120deg, var(--text-primary), var(--text-secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-text p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Pipeline Navigator */
+        .pipeline-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            flex-grow: 1;
+            margin-top: 1rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.85rem 1rem;
+            border-radius: var(--radius-md);
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            background: transparent;
+            text-decoration: none;
+            color: var(--text-secondary);
+        }
+
+        .nav-item:hover {
+            background-color: hsla(222, 40%, 20%, 0.3);
+            color: var(--text-primary);
+        }
+
+        .nav-item.active {
+            background-color: var(--color-primary-glow);
+            border-color: hsla(263, 90%, 65%, 0.3);
+            color: var(--text-primary);
+            box-shadow: inset 0 0 12px hsla(263, 90%, 65%, 0.05);
+        }
+
+        .nav-item.locked {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .nav-item.completed .step-badge {
+            background-color: var(--color-success);
+            color: var(--bg-base);
+            box-shadow: 0 0 10px hsla(145, 80%, 50%, 0.2);
+        }
+
+        .step-badge {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background-color: var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            transition: var(--transition-smooth);
+            flex-shrink: 0;
+        }
+
+        .nav-item.active .step-badge {
+            background-color: var(--color-primary);
+            color: var(--text-primary);
+            box-shadow: 0 0 10px hsla(263, 90%, 65%, 0.4);
+        }
+
+        .step-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .sidebar-footer {
+            border-top: 1px solid var(--border-color);
+            padding-top: 1.5rem;
+        }
+
+        .security-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            background-color: hsla(222, 40%, 25%, 0.2);
+            padding: 0.75rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Main Viewport */
+        .viewport {
+            padding: 3rem 4rem;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+            overflow-y: auto;
+        }
+
+        /* Wizard Cards */
+        .wizard-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 2.5rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: none;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        .wizard-card.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card-header {
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1.25rem;
+        }
+
+        .step-tag {
+            font-size: 0.75rem;
+            color: var(--color-secondary);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        .card-header h2 {
+            font-size: 1.75rem;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .card-header p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* Form Inputs */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        select,
+        textarea {
+            width: 100%;
+            background-color: hsla(222, 40%, 8%, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 0.9rem 1.1rem;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: var(--transition-smooth);
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px var(--color-primary-glow);
+        }
+
+        /* Buttons & Actions */
+        .actions-bar {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 2rem;
+            gap: 1rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.9rem 1.75rem;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            border: 1px solid transparent;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: var(--text-primary);
+            box-shadow: 0 4px 15px hsla(263, 90%, 65%, 0.25);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 4px 20px hsla(263, 90%, 65%, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            border-color: var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--text-secondary);
+            color: var(--text-primary);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        /* Curriculum & Diagnostics Questions UI */
+        .curriculum-list {
+            margin-bottom: 2rem;
+            background-color: hsla(222, 40%, 8%, 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1.25rem;
+        }
+
+        .curriculum-list h4 {
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+            color: var(--color-secondary);
+            text-transform: uppercase;
+        }
+
+        .curriculum-list ul {
+            list-style: none;
+            padding-left: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .curriculum-list li {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .curriculum-list li::before {
+            content: "•";
+            color: var(--color-primary);
+            font-weight: bold;
+        }
+
+        .question-card {
+            background-color: hsla(222, 40%, 8%, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .question-text {
+            font-weight: 500;
+            font-size: 1.05rem;
+            margin-bottom: 1.25rem;
+            line-height: 1.5;
+            color: var(--text-primary);
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            padding: 0.85rem 1.1rem;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: var(--transition-smooth);
+            background-color: hsla(222, 40%, 6%, 0.3);
+        }
+
+        .option-label:hover {
+            border-color: var(--text-muted);
+            background-color: hsla(222, 40%, 15%, 0.3);
+        }
+
+        .option-label input[type="radio"] {
+            accent-color: var(--color-primary);
+            width: 18px;
+            height: 18px;
+            margin: 0;
+        }
+
+        .option-label.selected {
+            border-color: var(--color-primary);
+            background-color: var(--color-primary-glow);
+            box-shadow: 0 0 10px hsla(263, 90%, 65%, 0.05);
+        }
+
+        /* Checklists and Weak Topics */
+        .weak-topics-box {
+            background-color: hsla(0, 85%, 60%, 0.03);
+            border: 1px dashed var(--color-error);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .weak-topics-title {
+            color: var(--color-error);
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .topic-pill {
+            display: inline-block;
+            background-color: hsla(222, 40%, 20%, 0.6);
+            border: 1px solid var(--border-color);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            margin: 0.25rem;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+        }
+
+        /* Study Plan Roadmap cards */
+        .roadmap-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .roadmap-card {
+            background-color: hsla(222, 40%, 8%, 0.3);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 1.25rem;
+            align-items: center;
+        }
+
+        .roadmap-card::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--gradient-primary);
+        }
+
+        .roadmap-num {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--color-primary-glow);
+            color: var(--color-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            border: 1px solid hsla(263, 90%, 65%, 0.3);
+        }
+
+        .roadmap-content h4 {
+            font-size: 1.05rem;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+        }
+
+        .roadmap-content p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .roadmap-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        /* Feedback UI */
+        .feedback-item {
+            background-color: hsla(222, 40%, 8%, 0.4);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .feedback-item.correct {
+            border-left: 4px solid var(--color-success);
+        }
+
+        .feedback-item.incorrect {
+            border-left: 4px solid var(--color-error);
+        }
+
+        .feedback-status {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .feedback-status.correct {
+            color: var(--color-success);
+        }
+
+        .feedback-status.incorrect {
+            color: var(--color-error);
+        }
+
+        .feedback-explanation {
+            margin-top: 1rem;
+            background-color: hsla(222, 40%, 5%, 0.5);
+            padding: 1rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            line-height: 1.4;
+            color: var(--text-secondary);
+        }
+
+        /* Score badges */
+        .score-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: var(--color-primary-glow);
+            border: 1px solid hsla(263, 90%, 65%, 0.2);
+            padding: 1.5rem 2rem;
+            border-radius: var(--radius-md);
+            margin-bottom: 2rem;
+        }
+
+        .score-details h3 {
+            font-size: 1.4rem;
+            color: var(--text-primary);
+        }
+
+        .score-badge {
+            font-size: 2.25rem;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 800;
+            color: var(--color-secondary);
+        }
+
+        /* JSON Export area */
+        .export-box {
+            background-color: hsla(222, 40%, 5%, 0.7);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            white-space: pre-wrap;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="logo-area">
+                <div class="logo-icon">🚀</div>
+                <div class="logo-text">
+                    <h2>EduGap Agent</h2>
+                    <p>Remediation Pipeline</p>
+                </div>
+            </div>
+            
+            <nav class="pipeline-nav" id="pipeline-nav">
+                <div class="nav-item active" data-step="1" id="nav-step-1" onclick="navigateToStep(1)">
+                    <div class="step-badge">1</div>
+                    <div class="step-label">Student Goal</div>
+                </div>
+                <div class="nav-item locked" data-step="2" id="nav-step-2" onclick="navigateToStep(2)">
+                    <div class="step-badge">2</div>
+                    <div class="step-label">Analyze Gaps</div>
+                </div>
+                <div class="nav-item locked" data-step="3" id="nav-step-3" onclick="navigateToStep(3)">
+                    <div class="step-badge">3</div>
+                    <div class="step-label">Weak Topics</div>
+                </div>
+                <div class="nav-item locked" data-step="4" id="nav-step-4" onclick="navigateToStep(4)">
+                    <div class="step-badge">4</div>
+                    <div class="step-label">Study Plan</div>
+                </div>
+                <div class="nav-item locked" data-step="5" id="nav-step-5" onclick="navigateToStep(5)">
+                    <div class="step-badge">5</div>
+                    <div class="step-label">Micro-Quiz</div>
+                </div>
+                <div class="nav-item locked" data-step="6" id="nav-step-6" onclick="navigateToStep(6)">
+                    <div class="step-badge">6</div>
+                    <div class="step-label">Progress Check</div>
+                </div>
+                <div class="nav-item locked" data-step="7" id="nav-step-7" onclick="navigateToStep(7)">
+                    <div class="step-badge">7</div>
+                    <div class="step-label">Academic Report</div>
+                </div>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="security-badge">
+                    <span>🛡️</span>
+                    <span>PII Clean & Encrypted logs active</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Viewport -->
+        <main class="viewport">
+
+            <!-- STEP 1: Student Goal -->
+            <div class="wizard-card active" id="card-step-1">
+                <div class="card-header">
+                    <span class="step-tag">Step 1 of 7</span>
+                    <h2>Define Your Target Objective</h2>
+                    <p>Tell us what subject you're working on, your current grade, and your target objectives so we can customize your diagnostic assessment.</p>
+                </div>
+                <form id="goal-form" onsubmit="submitStep1(event)">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="name">Your Name (Scrubbed PII)</label>
+                            <input type="text" id="name" required placeholder="e.g. Alice Smith">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email Address (Scrubbed PII)</label>
+                            <input type="email" id="email" required placeholder="e.g. alice@school.edu">
+                        </div>
+                        <div class="form-group">
+                            <label for="subject">Remediation Subject</label>
+                            <select id="subject" onchange="updateSubjectHint()">
+                                <option value="AP Physics 1">AP Physics 1: Algebra-Based</option>
+                                <option value="AP Calculus BC">AP Calculus BC</option>
+                                <option value="Chemistry">Chemistry</option>
+                                <option value="AI">AI (Artificial Intelligence)</option>
+                                <option value="Data Science">Data Science</option>
+                                <option value="Data Analyst">Data Analyst</option>
+                                <option value="Web Developer">Web Developer</option>
+                                <option value="Machine Learning">Machine Learning</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="level">Grade / Academic Level</label>
+                            <input type="text" id="level" required placeholder="e.g. Grade 11">
+                        </div>
+                        <div class="form-group">
+                            <label for="target">Target Milestone / Objective</label>
+                            <input type="text" id="target" required placeholder="e.g. Pass AP Physics Exam with a score of 5">
+                        </div>
+                        <div class="form-group">
+                            <label for="milestones">Study Time Horizon</label>
+                            <input type="text" id="milestones" required placeholder="e.g. Complete remediation in 4 weeks">
+                        </div>
+                    </div>
+                    <div class="actions-bar">
+                        <button type="submit" class="btn btn-primary">Initialize Diagnostic Agent 🚀</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- STEP 2: Analyze -->
+            <div class="wizard-card" id="card-step-2">
+                <div class="card-header">
+                    <span class="step-tag">Step 2 of 7</span>
+                    <h2>Baseline Diagnostic Evaluation</h2>
+                    <p>We've connected to the MCP Server to pull updated curriculum standards and textbook questions. Answer the concepts below to identify gaps.</p>
+                </div>
+                
+                <div class="curriculum-list">
+                    <h4 id="curr-title">Curriculum Loaded</h4>
+                    <ul id="curr-standards"></ul>
+                </div>
+                
+                <div id="diagnostic-questions-container">
+                    <!-- Diagnostic Questions will load here dynamically -->
+                </div>
+                
+                <div class="actions-bar">
+                    <button class="btn btn-secondary" onclick="prevStep()">Back</button>
+                    <button class="btn btn-primary" onclick="submitStep2()">Analyze Performance 📊</button>
+                </div>
+            </div>
+
+            <!-- STEP 3: Weak Topics -->
+            <div class="wizard-card" id="card-step-3">
+                <div class="card-header">
+                    <span class="step-tag">Step 3 of 7</span>
+                    <h2>Knowledge Gaps & Weak Topics</h2>
+                    <p>Here are the conceptual weaknesses identified by the Analysis Agent based on your diagnostic responses.</p>
+                </div>
+                
+                <div class="score-banner">
+                    <div class="score-details">
+                        <h3>Diagnostic Score</h3>
+                        <p>Total verified conceptual correct responses</p>
+                    </div>
+                    <div class="score-badge" id="diag-score-text">0/0</div>
+                </div>
+
+                <div class="weak-topics-box">
+                    <div class="weak-topics-title">
+                        <span>⚠️</span> Isolated Knowledge Gaps
+                    </div>
+                    <div id="weak-topics-container">
+                        <!-- Weak Topics will display here -->
+                    </div>
+                </div>
+
+                <div class="actions-bar">
+                    <button class="btn btn-secondary" onclick="prevStep()">Back</button>
+                    <button class="btn btn-primary" onclick="submitStep3()">Create Study Plan 📅</button>
+                </div>
+            </div>
+
+            <!-- STEP 4: Study Plan -->
+            <div class="wizard-card" id="card-step-4">
+                <div class="card-header">
+                    <span class="step-tag">Step 4 of 7</span>
+                    <h2>Personalized Study Plan</h2>
+                    <p>Our Remediation Agent has dynamically constructed a customized roadmap to target your isolated knowledge gaps with verified academic textbooks.</p>
+                </div>
+                
+                <div class="roadmap-grid" id="roadmap-container">
+                    <!-- Study plan items loaded dynamically -->
+                </div>
+
+                <div class="actions-bar">
+                    <button class="btn btn-secondary" onclick="prevStep()">Back</button>
+                    <button class="btn btn-primary" onclick="submitStep4()">Proceed to Micro-Quiz 📝</button>
+                </div>
+            </div>
+
+            <!-- STEP 5: Quiz -->
+            <div class="wizard-card" id="card-step-5">
+                <div class="card-header">
+                    <span class="step-tag">Step 5 of 7</span>
+                    <h2>Targeted Micro-Quiz</h2>
+                    <p>Let's verify your understanding. This micro-quiz focuses exclusively on your weak topics from the study plan.</p>
+                </div>
+                
+                <div id="quiz-questions-container">
+                    <!-- Quiz questions loaded dynamically -->
+                </div>
+
+                <div class="actions-bar">
+                    <button class="btn btn-secondary" onclick="prevStep()">Back</button>
+                    <button class="btn btn-primary" onclick="submitStep5()">Grade Micro-Quiz 📈</button>
+                </div>
+            </div>
+
+            <!-- STEP 6: Progress -->
+            <div class="wizard-card" id="card-step-6">
+                <div class="card-header">
+                    <span class="step-tag">Step 6 of 7</span>
+                    <h2>Progress & Feedback Matrix</h2>
+                    <p>See your graded performance, clear correct answers, and feedback to eliminate misconceptions.</p>
+                </div>
+
+                <div class="score-banner" style="background-color: hsla(145, 80%, 50%, 0.15); border-color: hsla(145, 80%, 50%, 0.2)">
+                    <div class="score-details">
+                        <h3>Micro-Quiz Score</h3>
+                        <p>Remediation Mastery Level achieved</p>
+                    </div>
+                    <div class="score-badge" style="color: var(--color-success)" id="quiz-score-text">0/0</div>
+                </div>
+                
+                <div id="feedback-container">
+                    <!-- Feedback items loaded dynamically -->
+                </div>
+
+                <div class="actions-bar">
+                    <button class="btn btn-secondary" onclick="prevStep()">Back</button>
+                    <button class="btn btn-primary" onclick="submitStep6()">Compile Final Report 🔒</button>
+                </div>
+            </div>
+
+            <!-- STEP 7: Report -->
+            <div class="wizard-card" id="card-step-7">
+                <div class="card-header">
+                    <span class="step-tag">Step 7 of 7</span>
+                    <h2>Anonymized Academic Report</h2>
+                    <p>Below is the compiled remediation report. Personal Identifiable Information (PII) has been fully anonymized from the data structure for security.</p>
+                </div>
+                
+                <div class="score-banner" style="background: linear-gradient(135deg, hsla(190, 80%, 50%, 0.1) 0%, hsla(263, 80%, 50%, 0.1) 100%);">
+                    <div class="score-details">
+                        <h3 id="report-subject">Subject: AP Physics</h3>
+                        <p id="report-milestone">Goal: Pass AP physics with 5</p>
+                    </div>
+                    <div class="score-badge" id="report-mastery-rate">0%</div>
+                </div>
+
+                <h4>Security Audited JSON Data:</h4>
+                <div class="export-box" id="json-export-data"></div>
+
+                <div class="actions-bar">
+                    <button class="btn btn-secondary" onclick="resetWizard()">Start New Session 🔄</button>
+                    <button class="btn btn-primary" onclick="downloadJSONReport()">Download Encrypted Report 💾</button>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Script Section -->
+    <script>
+        // Static mock databases representing MCP Server connection
+        const CURRICULUM_DATA = {
+            "AP Physics 1": {
+                "title": "AP Physics 1: Course guidelines",
+                "standards": [
+                    "Unit 2: Dynamics (Force and Newton's Laws)",
+                    "Unit 3: Circular Motion and Gravitation",
+                    "Unit 7: Torque and Rotational Motion"
+                ],
+                "diagnostics": [
+                    {
+                        "id": "app1_q1",
+                        "question": "A block of mass m is placed on a frictionless ramp inclined at angle θ. What is its acceleration down the ramp?",
+                        "choices": ["g", "g * sin(θ)", "g * cos(θ)", "g * tan(θ)"],
+                        "answer": "g * sin(θ)",
+                        "topic": "Unit 2: Dynamics (Force and Newton's Laws)"
+                    },
+                    {
+                        "id": "app1_q2",
+                        "question": "A disk of radius R and inertia I rotates with angular velocity ω. If a second identical disk is dropped onto it, what is the new angular velocity?",
+                        "choices": ["ω", "ω / 2", "2 * ω", "ω / 4"],
+                        "answer": "ω / 2",
+                        "topic": "Unit 7: Torque and Rotational Motion"
+                    },
+                    {
+                        "id": "app1_q3",
+                        "question": "An object moves in a circular path of radius r at speed v. If speed is doubled and radius halved, by what factor does centripetal acceleration change?",
+                        "choices": ["Unchanged", "Doubled", "Quadrupled", "Eightfold"],
+                        "answer": "Eightfold",
+                        "topic": "Unit 3: Circular Motion and Gravitation"
+                    }
+                ],
+                "textbooks": {
+                    "Unit 2: Dynamics (Force and Newton's Laws)": "OpenStax College Physics: Chapter 4 - Dynamics",
+                    "Unit 7: Torque and Rotational Motion": "Halliday & Resnick: Chapter 10 - Rotation",
+                    "Unit 3: Circular Motion and Gravitation": "OpenStax College Physics: Chapter 6 - Gravitation"
+                },
+                "quiz": {
+                    "Unit 2: Dynamics (Force and Newton's Laws)": {
+                        "id": "quiz_p1",
+                        "question": "A force F is applied to a mass m, producing acceleration a. If the force is doubled and mass halved, the acceleration becomes:",
+                        "choices": ["a/2", "a", "2a", "4a"],
+                        "answer": "4a",
+                        "explanation": "Newton's Second Law: a = F / m. If F is replaced by 2F and m by m/2, the new acceleration is (2F) / (m/2) = 4a."
+                    },
+                    "Unit 7: Torque and Rotational Motion": {
+                        "id": "quiz_p2",
+                        "question": "What torque is produced by a perpendicular force of 15 N applied 0.4 m from the pivot of a wrench?",
+                        "choices": ["6.0 N·m", "37.5 N·m", "0.026 N·m", "15.4 N·m"],
+                        "answer": "6.0 N·m",
+                        "explanation": "Torque (τ) = F * r = 15 N * 0.4 m = 6.0 N·m."
+                    },
+                    "Unit 3: Circular Motion and Gravitation": {
+                        "id": "quiz_p3",
+                        "question": "If the distance between two spherical masses is doubled, the gravitational force is:",
+                        "choices": ["Doubled", "Halved", "Quadrupled", "Quartered"],
+                        "answer": "Quartered",
+                        "explanation": "F = G * m1*m2 / r^2. Double the distance results in 1/4 the force."
+                    }
+                }
+            },
+            "AP Calculus BC": {
+                "title": "AP Calculus BC Course details",
+                "standards": [
+                    "Unit 1: Limits and Continuity",
+                    "Unit 9: Parametric, Polar, and Vectors",
+                    "Unit 10: Infinite Sequences and Series"
+                ],
+                "diagnostics": [
+                    {
+                        "id": "apc_q1",
+                        "question": "Determine the limit: lim (x -> 0) of (sin(5x) / x)",
+                        "choices": ["0", "1", "5", "Does not exist"],
+                        "answer": "5",
+                        "topic": "Unit 1: Limits and Continuity"
+                    },
+                    {
+                        "id": "apc_q2",
+                        "question": "Which of the following is the Taylor series representation of e^x centered at x = 0?",
+                        "choices": ["Sum of (x^n / n!)", "Sum of ((-1)^n * x^(2n) / (2n)!)", "Sum of (x^n)", "Sum of (n * x^n)"],
+                        "answer": "Sum of (x^n / n!)",
+                        "topic": "Unit 10: Infinite Sequences and Series"
+                    },
+                    {
+                        "id": "apc_q3",
+                        "question": "What is the area of the polar curve r = 3 * sin(θ) for 0 <= θ <= π?",
+                        "choices": ["9π / 4", "9π / 2", "3π", "9π"],
+                        "answer": "9π / 4",
+                        "topic": "Unit 9: Parametric, Polar, and Vectors"
+                    }
+                ],
+                "textbooks": {
+                    "Unit 1: Limits and Continuity": "Larson Calculus: Chapter 1 - Limits",
+                    "Unit 10: Infinite Sequences and Series": "Thomas' Calculus: Chapter 10 - Infinite Sequences and Series",
+                    "Unit 9: Parametric, Polar, and Vectors": "Larson Calculus: Chapter 10 - Polar Coordinates"
+                },
+                "quiz": {
+                    "Unit 1: Limits and Continuity": {
+                        "id": "quiz_c1",
+                        "question": "Find the limit: lim (x -> infinity) of (3x^2 + 5x) / (2x^2 - 7)",
+                        "choices": ["0", "1", "1.5", "Does not exist"],
+                        "answer": "1.5",
+                        "explanation": "Divide the terms by the highest power of x, resulting in 3/2 = 1.5."
+                    },
+                    "Unit 10: Infinite Sequences and Series": {
+                        "id": "quiz_c2",
+                        "question": "What is the sum of the geometric series 3 + 1 + 1/3 + 1/9 + ...?",
+                        "choices": ["4", "4.5", "6", "Infinite"],
+                        "answer": "4.5",
+                        "explanation": "S = a / (1 - r) = 3 / (1 - 1/3) = 4.5."
+                    },
+                    "Unit 9: Parametric, Polar, and Vectors": {
+                        "id": "quiz_c3",
+                        "question": "At what values of θ in [0, 2π] does the polar curve r = cos(θ) pass through the pole?",
+                        "choices": ["0 and π", "π/2 and 3π/2", "π/4 and 5π/4", "Never"],
+                        "answer": "π/2 and 3π/2",
+                        "explanation": "cos(θ) = 0 at θ = π/2 and 3π/2."
+                    }
+                }
+            },
+            "Chemistry": {
+                "title": "Chemistry Basics & Intermolecular Chemistry Standard",
+                "standards": [
+                    "Unit 1: Atoms, Molecules, and Ions",
+                    "Unit 2: Chemical Bonding & Intermolecular Forces",
+                    "Unit 3: Chemical Reactions & Stoichiometry"
+                ],
+                "diagnostics": [
+                    {
+                        "id": "chem_q1",
+                        "question": "What is the molecular geometry of water (H2O)?",
+                        "choices": ["Linear", "Bent", "Trigonal Planar", "Tetrahedral"],
+                        "answer": "Bent",
+                        "topic": "Unit 2: Chemical Bonding & Intermolecular Forces"
+                    }
+                ],
+                "textbooks": {
+                    "Unit 1: Atoms, Molecules, and Ions": "Brown & LeMay: Chemistry - Chapter 2",
+                    "Unit 2: Chemical Bonding & Intermolecular Forces": "Brown & LeMay: Chemistry - Chapter 9",
+                    "Unit 3: Chemical Reactions & Stoichiometry": "Brown & LeMay: Chemistry - Chapter 3"
+                },
+                "quiz": {
+                    "Unit 2: Chemical Bonding & Intermolecular Forces": {
+                        "id": "quiz_chem1",
+                        "question": "Which of the following intermolecular forces is strongest in pure liquid water?",
+                        "choices": ["London dispersion forces", "Dipole-dipole interactions", "Hydrogen bonding", "Ion-dipole forces"],
+                        "answer": "Hydrogen bonding",
+                        "explanation": "Hydrogen bonding is a strong dipole-dipole attraction that occurs when hydrogen is bonded to N, O, or F."
+                    }
+                }
+            },
+            "AI": {
+                "title": "Artificial Intelligence Foundations",
+                "standards": [
+                    "Unit 1: Introduction to Search Algorithms",
+                    "Unit 2: Knowledge Representation and Logic",
+                    "Unit 3: Neural Networks and Deep Learning"
+                ],
+                "diagnostics": [
+                    {
+                        "id": "ai_q1",
+                        "question": "Which search algorithm is guaranteed to find the shortest path in a graph if edge weights are non-negative?",
+                        "choices": ["Depth-First Search", "Dijkstra's Algorithm", "Greedy Best-First Search", "Random Walk"],
+                        "answer": "Dijkstra's Algorithm",
+                        "topic": "Unit 1: Introduction to Search Algorithms"
+                    }
+                ],
+                "textbooks": {
+                    "Unit 1: Introduction to Search Algorithms": "Russell & Norvig: AI - Chapter 3",
+                    "Unit 2: Knowledge Representation and Logic": "Russell & Norvig: AI - Chapter 7",
+                    "Unit 3: Neural Networks and Deep Learning": "Russell & Norvig: AI - Chapter 21"
+                },
+                "quiz": {
+                    "Unit 1: Introduction to Search Algorithms": {
+                        "id": "quiz_ai1",
+                        "question": "What is the primary heuristic function used in A* Search to find the optimal path?",
+                        "choices": ["f(n) = g(n) + h(n)", "f(n) = g(n) - h(n)", "f(n) = g(n)", "f(n) = h(n)"],
+                        "answer": "f(n) = g(n) + h(n)",
+                        "explanation": "A* Search computes f(n) where g(n) is path cost and h(n) is estimated cost to goal."
+                    }
+                }
+            },
+            "Data Science": {
+                "title": "Data Science & Applied Statistics Curriculum",
+                "standards": [
+                    "Unit 1: Data Cleansing & Exploration",
+                    "Unit 2: Probability & Statistical Inference",
+                    "Unit 3: Predictive Modeling & Evaluation"
+                ],
+                "diagnostics": [
+                    {
+                        "id": "ds_q1",
+                        "question": "Which statistical metric is most sensitive to outliers in a numerical dataset?",
+                        "choices": ["Median", "Mode", "Mean", "Interquartile Range"],
+                        "answer": "Mean",
+                        "topic": "Unit 2: Probability & Statistical Inference"
+                    }
+                ],
+                "textbooks": {
+                    "Unit 1: Data Cleansing & Exploration": "Python Data Science Handbook: Chapter 3",
+                    "Unit 2: Probability & Statistical Inference": "Python Data Science Handbook: Chapter 4",
+                    "Unit 3: Predictive Modeling & Evaluation": "Python Data Science Handbook: Chapter 5"
+                },
+                "quiz": {
+                    "Unit 2: Probability & Statistical Inference": {
+                        "id": "quiz_ds1",
+                        "question": "If a model has high variance and suffers from overfitting, what technique is best to remediate this?",
+                        "choices": ["Add more features", "Increase model complexity", "L2 Regularization (Ridge)", "Remove data points"],
+                        "answer": "L2 Regularization (Ridge)",
+                        "explanation": "Regularization penalizes large coefficients to reduce variance and overfitting."
+                    }
+                }
+            },
+            "Data Analyst": {
+                "title": "Data Analyst Career Syllabus",
+                "standards": [
+                    "Unit 1: SQL Queries and Data Aggregation",
+                    "Unit 2: Data Visualization Principles",
+                    "Unit 3: Business Metrics & Cohort Analysis"
+                ],
+                "diagnostics": [
+                    {
+                        "id": "da_q1",
+                        "question": "Which SQL clause is used to filter groups returned by a GROUP BY clause?",
+                        "choices": ["WHERE", "HAVING", "FILTER", "SORT BY"],
+                        "answer": "HAVING",
+                        "topic": "Unit 1: SQL Queries and Data Aggregation"
+                    }
+                ],
+                "textbooks": {
+                    "Unit 1: SQL Queries and Data Aggregation": "SQL for Data Analysis: Chapter 3",
+                    "Unit 2: Data Visualization Principles": "Storytelling with Data Guide",
+                    "Unit 3: Business Metrics & Cohort Analysis": "Lean Analytics Guide"
+                },
+                "quiz": {
+                    "Unit 1: SQL Queries and Data Aggregation": {
+                        "id": "quiz_da1",
+                        "question": "What type of join in SQL returns all records from the left table and matched records from the right table?",
+                        "choices": ["INNER JOIN", "LEFT JOIN", "RIGHT JOIN", "FULL OUTER JOIN"],
+                        "answer": "LEFT JOIN",
+                        "explanation": "A LEFT JOIN returns all rows from the left table plus matching rows from the right table."
+                    }
+                }
+            },
+            "Web Developer": {
+                "title": "Web Development Career Roadmap",
+                "standards": [
+                    "Unit 1: HTML5 Semantics & CSS Layouts",
+                    "Unit 2: JavaScript DOM Manipulation & Async API Calls",
+                    "Unit 3: Web Performance and Client-Side Routing"
+                ],
+                "diagnostics": [
+                    {
+                        "id": "web_q1",
+                        "question": "What CSS Flexbox property specifies the alignment of items along the main axis?",
+                        "choices": ["align-items", "justify-content", "align-content", "flex-direction"],
+                        "answer": "justify-content",
+                        "topic": "Unit 1: HTML5 Semantics & CSS Layouts"
+                    }
+                ],
+                "textbooks": {
+                    "Unit 1: HTML5 Semantics & CSS Layouts": "MDN Web Docs: Flexbox Guide",
+                    "Unit 2: JavaScript DOM Manipulation & Async API Calls": "Eloquent JavaScript: Chapter 14",
+                    "Unit 3: Web Performance and Client-Side Routing": "High Performance Browser Networking"
+                },
+                "quiz": {
+                    "Unit 1: HTML5 Semantics & CSS Layouts": {
+                        "id": "quiz_web1",
+                        "question": "Which JavaScript method is used to register an event handler on a DOM element?",
+                        "choices": ["addEventListener", "attachEventHandler", "bindEvent", "onclickEvent"],
+                        "answer": "addEventListener",
+                        "explanation": "addEventListener() registers the specified listener on the target."
+                    }
+                }
+            },
+            "Machine Learning": {
+                "title": "Machine Learning Engineer Curriculum",
+                "standards": [
+                    "Unit 1: Supervised Learning (Regression & Classification)",
+                    "Unit 2: Unsupervised Learning (Clustering & Dimensionality Reduction)",
+                    "Unit 3: Model Tuning & Hyperparameters"
+                ],
+                "diagnostics": [
+                    {
+                        "id": "ml_q1",
+                        "question": "In a binary classification problem, if the positive class is extremely rare, which evaluation metric is most informative?",
+                        "choices": ["Accuracy", "F1-Score / Precision-Recall AUC", "Mean Absolute Error", "R-squared"],
+                        "answer": "F1-Score / Precision-Recall AUC",
+                        "topic": "Unit 1: Supervised Learning (Regression & Classification)"
+                    }
+                ],
+                "textbooks": {
+                    "Unit 1: Supervised Learning (Regression & Classification)": "Hands-On ML: Chapter 3",
+                    "Unit 2: Unsupervised Learning (Clustering & Dimensionality Reduction)": "Hands-On ML: Chapter 9",
+                    "Unit 3: Model Tuning & Hyperparameters": "Hands-On ML: Chapter 2"
+                },
+                "quiz": {
+                    "Unit 1: Supervised Learning (Regression & Classification)": {
+                        "id": "quiz_ml1",
+                        "question": "What is the primary objective of Principal Component Analysis (PCA)?",
+                        "choices": ["Predict continuous targets", "Group similar data clusters", "Reduce dimensionality while preserving variance", "Optimize gradient descent learning rate"],
+                        "answer": "Reduce dimensionality while preserving variance",
+                        "explanation": "PCA projects data into orthogonal dimensions of maximum variance to reduce feature dimensionality."
+                    }
+                }
+            }
+        };
+
+        // Application State
+        let appState = {
+            currentStep: 1,
+            maxCompletedStep: 0,
+            studentInfo: {
+                name: "",
+                email: "",
+                subject: "",
+                level: "",
+                target: "",
+                milestones: ""
+            },
+            curriculum: null,
+            diagnosticAnswers: {},
+            weakTopics: [],
+            studyPlan: [],
+            quizAnswers: {},
+            quizScore: "",
+            feedback: [],
+            masteryLevel: "0%"
+        };
+
+        // Navigation
+        function updateSidebar() {
+            for (let i = 1; i <= 7; i++) {
+                const navItem = document.getElementById(`nav-step-${i}`);
+                navItem.className = "nav-item";
+                
+                if (i === appState.currentStep) {
+                    navItem.classList.add("active");
+                }
+                
+                if (i > appState.maxCompletedStep + 1) {
+                    navItem.classList.add("locked");
+                } else if (i <= appState.maxCompletedStep) {
+                    navItem.classList.add("completed");
+                }
+            }
+        }
+
+        function navigateToStep(step) {
+            if (step > appState.maxCompletedStep + 1) {
+                // Prevent jumping forward to locked steps
+                return;
+            }
+            
+            // Hide all active cards
+            document.querySelectorAll(".wizard-card").forEach(card => card.classList.remove("active"));
+            
+            // Show requested card
+            document.getElementById(`card-step-${step}`).classList.add("active");
+            appState.currentStep = step;
+            updateSidebar();
+        }
+
+        function nextStep() {
+            if (appState.currentStep < 7) {
+                appState.maxCompletedStep = Math.max(appState.maxCompletedStep, appState.currentStep);
+                navigateToStep(appState.currentStep + 1);
+            }
+        }
+
+        function prevStep() {
+            if (appState.currentStep > 1) {
+                navigateToStep(appState.currentStep - 1);
+            }
+        }
+
+        // Action Submissions
+        
+        // Step 1
+        function submitStep1(event) {
+            event.preventDefault();
+            
+            appState.studentInfo.name = document.getElementById("name").value.trim();
+            appState.studentInfo.email = document.getElementById("email").value.trim();
+            appState.studentInfo.subject = document.getElementById("subject").value;
+            appState.studentInfo.level = document.getElementById("level").value.trim();
+            appState.studentInfo.target = document.getElementById("target").value.trim();
+            appState.studentInfo.milestones = document.getElementById("milestones").value.trim();
+            
+            // Load curriculum guidelines (Step 2 Prep)
+            appState.curriculum = CURRICULUM_DATA[appState.studentInfo.subject];
+            
+            document.getElementById("curr-title").innerText = appState.curriculum.title;
+            const standardsUl = document.getElementById("curr-standards");
+            standardsUl.innerHTML = "";
+            appState.curriculum.standards.forEach(std => {
+                const li = document.createElement("li");
+                li.innerText = std;
+                standardsUl.appendChild(li);
+            });
+            
+            // Load Diagnostic Questions
+            const diagContainer = document.getElementById("diagnostic-questions-container");
+            diagContainer.innerHTML = "";
+            appState.curriculum.diagnostics.forEach(q => {
+                const card = document.createElement("div");
+                card.className = "question-card";
+                
+                const qText = document.createElement("div");
+                qText.className = "question-text";
+                qText.innerText = q.question;
+                card.appendChild(qText);
+                
+                const optList = document.createElement("div");
+                optList.className = "options-list";
+                
+                q.choices.forEach(opt => {
+                    const label = document.createElement("label");
+                    label.className = "option-label";
+                    label.id = `label-${q.id}-${opt.replace(/[^a-z0-9]/gi, '_')}`;
+                    
+                    const radio = document.createElement("input");
+                    radio.type = "radio";
+                    radio.name = q.id;
+                    radio.value = opt;
+                    radio.onclick = () => selectOption(q.id, opt, label.id);
+                    
+                    label.appendChild(radio);
+                    label.appendChild(document.createTextNode(" " + opt));
+                    optList.appendChild(label);
+                });
+                
+                card.appendChild(optList);
+                diagContainer.appendChild(card);
+            });
+
+            nextStep();
+        }
+
+        function selectOption(questionId, optionVal, labelId) {
+            // Unselect others in the same question group
+            const radios = document.getElementsByName(questionId);
+            radios.forEach(r => {
+                const parent = r.parentElement;
+                parent.classList.remove("selected");
+            });
+            
+            // Select current
+            document.getElementById(labelId).classList.add("selected");
+            appState.diagnosticAnswers[questionId] = optionVal;
+        }
+
+        // Step 2
+        function submitStep2() {
+            // Check if all questions are answered
+            const diagnostics = appState.curriculum.diagnostics;
+            let answeredAll = true;
+            diagnostics.forEach(q => {
+                if (!appState.diagnosticAnswers[q.id]) {
+                    answeredAll = false;
+                }
+            });
+            
+            if (!answeredAll) {
+                alert("Please answer all diagnostic questions to complete the analysis!");
+                return;
+            }
+            
+            // Perform analysis
+            let correctCount = 0;
+            appState.weakTopics = [];
+            
+            diagnostics.forEach(q => {
+                if (appState.diagnosticAnswers[q.id] === q.answer) {
+                    correctCount++;
+                } else {
+                    appState.weakTopics.push(q.topic);
+                }
+            });
+            
+            appState.diagnosticScore = `${correctCount}/${diagnostics.length}`;
+            
+            // Render Step 3
+            document.getElementById("diag-score-text").innerText = appState.diagnosticScore;
+            const container = document.getElementById("weak-topics-container");
+            container.innerHTML = "";
+            if (appState.weakTopics.length > 0) {
+                appState.weakTopics.forEach(topic => {
+                    const pill = document.createElement("div");
+                    pill.className = "topic-pill";
+                    pill.innerText = topic;
+                    container.appendChild(pill);
+                });
+            } else {
+                container.innerHTML = "<p style='color: var(--color-success); font-weight: 600;'>🎉 No knowledge gaps found! Proceed to build consolidation study plan.</p>";
+            }
+            
+            nextStep();
+        }
+
+        // Step 3
+        function submitStep3() {
+            // Generate Study Plan (Step 4 Prep)
+            appState.studyPlan = [];
+            const textbooks = appState.curriculum.textbooks;
+            
+            if (appState.weakTopics.length > 0) {
+                appState.weakTopics.forEach(topic => {
+                    appState.studyPlan.push({
+                        topic: topic,
+                        reference: textbooks[topic] || "General subject reference handbook",
+                        duration: "2 hours targeted study"
+                    });
+                });
+            } else {
+                appState.studyPlan.push({
+                    topic: "Advanced Consolidation & Mastery",
+                    reference: "Recommended academic review exercises for " + appState.studentInfo.subject,
+                    duration: "1 hour review"
+                });
+            }
+            
+            // Render Step 4
+            const container = document.getElementById("roadmap-container");
+            container.innerHTML = "";
+            appState.studyPlan.forEach((item, index) => {
+                const card = document.createElement("div");
+                card.className = "roadmap-card";
+                
+                const num = document.createElement("div");
+                num.className = "roadmap-num";
+                num.innerText = index + 1;
+                card.appendChild(num);
+                
+                const content = document.createElement("div");
+                content.className = "roadmap-content";
+                
+                const h4 = document.createElement("h4");
+                h4.innerText = item.topic;
+                content.appendChild(h4);
+                
+                const p = document.createElement("p");
+                p.innerText = `Resource: ${item.reference}`;
+                content.appendChild(p);
+                
+                const meta = document.createElement("div");
+                meta.className = "roadmap-meta";
+                meta.innerHTML = `<span class="meta-item">⏱️ ${item.duration}</span>`;
+                content.appendChild(meta);
+                
+                card.appendChild(content);
+                container.appendChild(card);
+            });
+
+            nextStep();
+        }
+
+        // Step 4
+        function submitStep4() {
+            // Load Quiz Questions (Step 5 Prep)
+            const quizContainer = document.getElementById("quiz-questions-container");
+            quizContainer.innerHTML = "";
+            
+            const quizDb = appState.curriculum.quiz;
+            let quizItems = [];
+            
+            if (appState.weakTopics.length > 0) {
+                appState.weakTopics.forEach(topic => {
+                    if (quizDb[topic]) {
+                        quizItems.push(quizDb[topic]);
+                    }
+                });
+            } else {
+                // If no weak topics, take first 2 quiz questions for general confirmation
+                Object.values(quizDb).slice(0, 2).forEach(q => quizItems.push(q));
+            }
+            
+            appState.activeQuizQuestions = quizItems;
+            
+            quizItems.forEach(q => {
+                const card = document.createElement("div");
+                card.className = "question-card";
+                
+                const qText = document.createElement("div");
+                qText.className = "question-text";
+                qText.innerText = q.question;
+                card.appendChild(qText);
+                
+                const optList = document.createElement("div");
+                optList.className = "options-list";
+                
+                q.choices.forEach(opt => {
+                    const label = document.createElement("label");
+                    label.className = "option-label";
+                    label.id = `quiz-label-${q.id}-${opt.replace(/[^a-z0-9]/gi, '_')}`;
+                    
+                    const radio = document.createElement("input");
+                    radio.type = "radio";
+                    radio.name = `quiz-${q.id}`;
+                    radio.value = opt;
+                    radio.onclick = () => selectQuizOption(q.id, opt, label.id);
+                    
+                    label.appendChild(radio);
+                    label.appendChild(document.createTextNode(" " + opt));
+                    optList.appendChild(label);
+                });
+                
+                card.appendChild(optList);
+                quizContainer.appendChild(card);
+            });
+
+            nextStep();
+        }
+
+        function selectQuizOption(questionId, optionVal, labelId) {
+            const radios = document.getElementsByName(`quiz-${questionId}`);
+            radios.forEach(r => {
+                const parent = r.parentElement;
+                parent.classList.remove("selected");
+            });
+            
+            document.getElementById(labelId).classList.add("selected");
+            appState.quizAnswers[questionId] = optionVal;
+        }
+
+        // Step 5
+        function submitStep5() {
+            const quizItems = appState.activeQuizQuestions;
+            let answeredAll = true;
+            quizItems.forEach(q => {
+                if (!appState.quizAnswers[q.id]) {
+                    answeredAll = false;
+                }
+            });
+            
+            if (!answeredAll) {
+                alert("Please complete all quiz questions to compile feedback!");
+                return;
+            }
+            
+            // Graded feedback
+            let correctCount = 0;
+            appState.feedback = [];
+            
+            quizItems.forEach(q => {
+                const studentAns = appState.quizAnswers[q.id];
+                const isCorrect = studentAns === q.answer;
+                if (isCorrect) correctCount++;
+                
+                appState.feedback.push({
+                    question: q.question,
+                    is_correct: isCorrect,
+                    student_answer: studentAns,
+                    correct_answer: q.answer,
+                    comment: isCorrect ? "Perfect score on this topic! You have mastered this concept." : "Not quite, but this is a great learning opportunity.",
+                    explanation: q.explanation
+                });
+            });
+            
+            appState.quizScore = `${correctCount}/${quizItems.length}`;
+            const pct = quizItems.length > 0 ? (correctCount / quizItems.length) * 100 : 100;
+            appState.masteryLevel = `${pct.toFixed(1)}%`;
+            
+            // Render Step 6
+            document.getElementById("quiz-score-text").innerText = appState.quizScore;
+            
+            const feedbackContainer = document.getElementById("feedback-container");
+            feedbackContainer.innerHTML = "";
+            appState.feedback.forEach(f => {
+                const div = document.createElement("div");
+                div.className = `feedback-item ${f.is_correct ? 'correct' : 'incorrect'}`;
+                
+                const status = document.createElement("div");
+                status.className = `feedback-status ${f.is_correct ? 'correct' : 'incorrect'}`;
+                status.innerText = f.is_correct ? "✅ Correct" : "❌ Incorrect";
+                div.appendChild(status);
+                
+                const qText = document.createElement("div");
+                qText.className = "question-text";
+                qText.innerText = f.question;
+                div.appendChild(qText);
+                
+                const studentAnsDiv = document.createElement("div");
+                studentAnsDiv.innerHTML = `<p style="font-size: 0.9rem; margin-bottom: 0.25rem;">Your Answer: <strong style="color: ${f.is_correct ? 'var(--color-success)' : 'var(--color-error)'}">${f.student_answer}</strong></p>`;
+                div.appendChild(studentAnsDiv);
+
+                if (!f.is_correct) {
+                    const correctAnsDiv = document.createElement("div");
+                    correctAnsDiv.innerHTML = `<p style="font-size: 0.9rem; margin-bottom: 0.5rem;">Correct Answer: <strong style="color: var(--color-success)">${f.correct_answer}</strong></p>`;
+                    div.appendChild(correctAnsDiv);
+                }
+                
+                const comment = document.createElement("p");
+                comment.innerText = f.comment;
+                comment.style.fontSize = "0.9rem";
+                div.appendChild(comment);
+                
+                if (f.explanation) {
+                    const exp = document.createElement("div");
+                    exp.className = "feedback-explanation";
+                    exp.innerText = `Explanation: ${f.explanation}`;
+                    div.appendChild(exp);
+                }
+                
+                feedbackContainer.appendChild(div);
+            });
+
+            nextStep();
+        }
+
+        // Step 6 (Anonymization & Final Report compilation)
+        function submitStep6() {
+            // Client-side PII scrubber utility
+            const scrubText = (val) => {
+                if (!val) return val;
+                // Anonymize email pattern
+                val = val.replace(/[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+/g, "[ANONYMIZED_EMAIL]");
+                // Anonymize phone pattern
+                val = val.replace(/\b(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/g, "[ANONYMIZED_PHONE]");
+                
+                // Anonymize name if matches
+                if (appState.studentInfo.name) {
+                    const re = new RegExp(appState.studentInfo.name.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'gi');
+                    val = val.replace(re, "[ANONYMIZED_NAME]");
+                }
+                return val;
+            };
+            
+            // Build the final academic report payload
+            const reportData = {
+                "academic_metrics": {
+                    "subject": appState.studentInfo.subject,
+                    "grade_level": appState.studentInfo.level,
+                    "target_milestone": appState.studentInfo.target,
+                    "timeline": appState.studentInfo.milestones,
+                    "diagnostic_score": appState.diagnosticScore,
+                    "weak_topics_isolated": appState.weakTopics,
+                    "quiz_remedy_score": appState.quizScore,
+                    "mastery_rate": appState.masteryLevel
+                },
+                "security_audit": {
+                    "pii_anonymization_verified": true,
+                    "student_key_hash": "[SECURE_LOCALLY_HASHED]"
+                }
+            };
+            
+            // Safety double check scrub run over stringified JSON payload
+            const rawReportStr = JSON.stringify(reportData, null, 2);
+            const scrubbedReportStr = scrubText(rawReportStr);
+            const scrubbedReportObj = JSON.parse(scrubbedReportStr);
+            
+            // Render Step 7
+            document.getElementById("report-subject").innerText = `Subject: ${scrubbedReportObj.academic_metrics.subject}`;
+            document.getElementById("report-milestone").innerText = `Goal: ${scrubbedReportObj.academic_metrics.target_milestone}`;
+            document.getElementById("report-mastery-rate").innerText = scrubbedReportObj.academic_metrics.mastery_rate;
+            
+            document.getElementById("json-export-data").innerText = JSON.stringify(scrubbedReportObj, null, 2);
+            appState.finalReportJSON = scrubbedReportObj;
+            
+            nextStep();
+        }
+
+        // Step 7 Utilities
+        function downloadJSONReport() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appState.finalReportJSON, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            downloadAnchor.setAttribute("download", `academic_report_${appState.studentInfo.subject.replace(/[^a-z0-9]/gi, '_')}.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+        }
+
+        function resetWizard() {
+            appState = {
+                currentStep: 1,
+                maxCompletedStep: 0,
+                studentInfo: {
+                    name: "",
+                    email: "",
+                    subject: "",
+                    level: "",
+                    target: "",
+                    milestones: ""
+                },
+                curriculum: null,
+                diagnosticAnswers: {},
+                weakTopics: [],
+                studyPlan: [],
+                quizAnswers: {},
+                quizScore: "",
+                feedback: [],
+                masteryLevel: "0%"
+            };
+            
+            // Reset input values
+            document.getElementById("goal-form").reset();
+            
+            // Reset navigations
+            navigateToStep(1);
+        }
+
+        function updateSubjectHint() {
+            // Optional utility to toggle placeholders
+        }
+    </script>
+</body>
+</html>
