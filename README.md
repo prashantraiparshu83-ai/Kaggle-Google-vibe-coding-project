@@ -17,25 +17,10 @@ An advanced, security-first **Education Gap AI Agent** designed using a Multi-Ag
 
 The agent system operates through a sequential, state-passing pipeline. Each step must be successfully completed and verified before proceeding to the next.
 
-```mermaid
-graph TD
-    A["Step 1: Student Goal (Diagnostic Agent)"] --> B["Step 2: Analyze (Curriculum Agent)"]
-    B --> C["Step 3: Weak Topics (Analysis Agent)"]
-    C --> D["Step 4: Study Plan (Remediation Agent)"]
-    D --> E["Step 5: Quiz (Assessment Agent)"]
-    E --> F["Step 6: Progress (Feedback Agent)"]
-    F --> G["Step 7: Final Report (Security/Report Agent)"]
 
-    style A fill:#e1f5fe,stroke:#03a9f4,stroke-width:2px
-    style B fill:#e8f5e9,stroke:#4caf50,stroke-width:2px
-    style C fill:#ffe0b2,stroke:#ff9800,stroke-width:2px
-    style D fill:#f3e5f5,stroke:#9c27b0,stroke-width:2px
-    style E fill:#fff9c4,stroke:#fbc02d,stroke-width:2px
-    style F fill:#e0f2f1,stroke:#009688,stroke-width:2px
-    style G fill:#ffebee,stroke:#f44336,stroke-width:2px
-```
 
----
+<img width="756" height="457" alt="Image" src="https://github.com/user-attachments/assets/fbd0def4-8a6f-4f2a-88b7-9805954e36ce" />
+
 
 ## 🔄 Sequential Execution Pipeline (7 Steps)
 
