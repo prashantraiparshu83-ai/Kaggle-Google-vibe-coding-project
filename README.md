@@ -119,6 +119,7 @@ python -m agents_cli.main report --session-id <UUID> --export pdf
 
 ### 6.Overview
 
+<img width="1917" height="957" alt="Image" src="https://github.com/user-attachments/assets/ec4db081-35fe-4e16-b558-f14e8474496f" />
 
 ## 💬 Tone & Style Guidelines
 
